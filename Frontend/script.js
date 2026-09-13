@@ -2,132 +2,444 @@ const API_BASE = "http://127.0.0.1:8000";
 
 let currentReportId = null;
 
-const serverStatus = document.getElementById("serverStatus");
-const candidateType = document.getElementById("candidateType");
-const targetCompany = document.getElementById("targetCompany");
-const targetField = document.getElementById("targetField");
-const experienceYears = document.getElementById("experienceYears");
-const preferredRole = document.getElementById("preferredRole");
-const resumeInput = document.getElementById("resumeInput");
-const fileName = document.getElementById("fileName");
-const jobDescription = document.getElementById("jobDescription");
-const analyzeBtn = document.getElementById("analyzeBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-const shareBtn = document.getElementById("shareBtn");
+
+/* =========================================================
+   DOM ELEMENTS
+========================================================= */
+
+const serverStatus =
+    document.getElementById("serverStatus");
+
+const candidateType =
+    document.getElementById("candidateType");
+
+const targetCompany =
+    document.getElementById("targetCompany");
+
+const targetField =
+    document.getElementById("targetField");
+
+const experienceYears =
+    document.getElementById("experienceYears");
+
+const preferredRole =
+    document.getElementById("preferredRole");
+
+const resumeInput =
+    document.getElementById("resumeInput");
+
+const fileName =
+    document.getElementById("fileName");
+
+const jobDescription =
+    document.getElementById("jobDescription");
+
+const analyzeBtn =
+    document.getElementById("analyzeBtn");
+
+const downloadBtn =
+    document.getElementById("downloadBtn");
+
+const shareBtn =
+    document.getElementById("shareBtn");
+
+
+/* =========================================================
+   FILE UPLOAD
+========================================================= */
 
 resumeInput.addEventListener("change", () => {
+
     if (resumeInput.files.length > 0) {
-        fileName.textContent = resumeInput.files[0].name;
+
+        const file = resumeInput.files[0];
+
+        fileName.textContent = file.name;
+
     } else {
-        fileName.textContent = "PDF, DOCX, or TXT supported";
+
+        fileName.textContent =
+            "PDF, DOCX, or TXT supported";
+
     }
+
 });
 
+
+/* =========================================================
+   SERVER STATUS
+========================================================= */
+
 async function checkServer() {
+
     try {
-        const response = await fetch(`${API_BASE}/health`);
+
+        const response =
+            await fetch(`${API_BASE}/health`);
+
 
         if (!response.ok) {
-            throw new Error("Offline");
+            throw new Error("Server unavailable");
         }
 
-        serverStatus.textContent = "Server Online";
+
+        serverStatus.innerHTML = `
+            <span class="status-dot"></span>
+            <span>Server Online</span>
+        `;
+
+
         serverStatus.classList.remove("offline");
         serverStatus.classList.add("online");
 
-    } catch {
-        serverStatus.textContent = "Server Offline";
+    } catch (error) {
+
+        serverStatus.innerHTML = `
+            <span class="status-dot"></span>
+            <span>Server Offline</span>
+        `;
+
+
         serverStatus.classList.remove("online");
         serverStatus.classList.add("offline");
+
     }
+
 }
 
+
+/* =========================================================
+   ANALYZE RESUME
+========================================================= */
+
 analyzeBtn.addEventListener("click", async (event) => {
+
     event.preventDefault();
 
-    const file = resumeInput.files[0];
-    const jd = jobDescription.value.trim();
+
+    const file =
+        resumeInput.files[0];
+
+
+    const jd =
+        jobDescription.value.trim();
+
 
     if (!file) {
+
         alert("Please upload your resume.");
+
         return;
+
     }
+
 
     if (!jd) {
-        alert("Please paste the job description.");
+
+        alert(
+            "Please paste the job description."
+        );
+
         return;
+
     }
 
-    const formData = new FormData();
 
-    formData.append("file", file);
-    formData.append("job_description", jd);
-    formData.append("candidate_type", candidateType.value);
-    formData.append("target_field", targetField.value);
-    formData.append("experience_years", experienceYears.value || "0");
-    formData.append("preferred_role", preferredRole.value || "");
-    formData.append("target_company", targetCompany.value);
+    const formData =
+        new FormData();
 
-    analyzeBtn.disabled = true;
-    analyzeBtn.textContent = "Scanning Resume...";
-    downloadBtn.disabled = true;
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    formData.append(
+        "job_description",
+        jd
+    );
+
+
+    formData.append(
+        "candidate_type",
+        candidateType.value
+    );
+
+
+    formData.append(
+        "target_field",
+        targetField.value
+    );
+
+
+    formData.append(
+        "experience_years",
+        experienceYears.value || "0"
+    );
+
+
+    formData.append(
+        "preferred_role",
+        preferredRole.value || ""
+    );
+
+
+    formData.append(
+        "target_company",
+        targetCompany.value
+    );
+
+
+    setLoadingState(true);
+
 
     try {
-        const response = await fetch(`${API_BASE}/analyze`, {
-            method: "POST",
-            body: formData
-        });
 
-        const data = await response.json();
+        const response =
+            await fetch(
+                `${API_BASE}/analyze`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
 
-        if (!response.ok) {
-            throw new Error(data.detail || "Analysis failed.");
+
+        let data;
+
+
+        try {
+
+            data = await response.json();
+
+        } catch {
+
+            throw new Error(
+                "Invalid response received from server."
+            );
+
         }
 
-        currentReportId = data.analysis_id;
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                data.message ||
+                "Resume analysis failed."
+            );
+
+        }
+
+
+        currentReportId =
+            data.analysis_id;
+
 
         renderResult(data);
 
-        downloadBtn.disabled = false;
+
+        if (currentReportId) {
+            downloadBtn.disabled = false;
+        }
+
 
     } catch (error) {
-        console.error(error);
-        alert("Error: " + error.message);
+
+        console.error(
+            "ATSLens Analysis Error:",
+            error
+        );
+
+
+        alert(
+            `Analysis Error: ${error.message}`
+        );
 
     } finally {
-        analyzeBtn.disabled = false;
-        analyzeBtn.textContent = "Analyze Resume";
+
+        setLoadingState(false);
+
     }
+
 });
+
+
+/* =========================================================
+   LOADING STATE
+========================================================= */
+
+function setLoadingState(isLoading) {
+
+    analyzeBtn.disabled =
+        isLoading;
+
+
+    if (isLoading) {
+
+        analyzeBtn.innerHTML = `
+            <span class="button-icon">
+                ✦
+            </span>
+
+            <span>
+                Analyzing Resume...
+            </span>
+
+            <span class="button-arrow">
+                •••
+            </span>
+        `;
+
+
+        downloadBtn.disabled =
+            true;
+
+    } else {
+
+        analyzeBtn.innerHTML = `
+            <span class="button-icon">
+                ✦
+            </span>
+
+            <span>
+                Analyze Resume
+            </span>
+
+            <span class="button-arrow">
+                →
+            </span>
+        `;
+
+
+        if (currentReportId) {
+            downloadBtn.disabled = false;
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   DOWNLOAD PDF
+========================================================= */
 
 downloadBtn.addEventListener("click", () => {
+
     if (!currentReportId) {
-        alert("Please run analysis first.");
+
+        alert(
+            "Please analyze your resume first."
+        );
+
         return;
+
     }
 
-    window.open(`${API_BASE}/download-report/${currentReportId}`, "_blank");
+
+    window.open(
+        `${API_BASE}/download-report/${currentReportId}`,
+        "_blank"
+    );
+
 });
+
+
+/* =========================================================
+   SHARE REPORT
+========================================================= */
 
 shareBtn.addEventListener("click", async () => {
-    const score = document.getElementById("overallScore").textContent;
-    const field = document.getElementById("bestField").textContent;
 
-    const text = `My ATSLens resume analysis score is ${score}. Best fit field: ${field}.`;
+    const score =
+        document
+            .getElementById("overallScore")
+            .textContent;
+
+
+    const bestField =
+        document
+            .getElementById("bestField")
+            .textContent;
+
+
+    const grade =
+        document
+            .getElementById("finalGrade")
+            .textContent;
+
+
+    const text =
+        `ATSLens Resume Analysis
+
+ATS Score: ${score}
+Grade: ${grade}
+Best Career Match: ${bestField}`;
+
+
+    if (
+        navigator.share &&
+        window.isSecureContext
+    ) {
+
+        try {
+
+            await navigator.share({
+                title:
+                    "ATSLens Resume Analysis",
+                text: text
+            });
+
+            return;
+
+        } catch (error) {
+
+            if (
+                error.name ===
+                "AbortError"
+            ) {
+
+                return;
+
+            }
+
+        }
+
+    }
+
 
     try {
-        await navigator.clipboard.writeText(text);
-        alert("Report summary copied to clipboard.");
 
-    } catch {
+        await navigator.clipboard
+            .writeText(text);
+
+
+        alert(
+            "Report summary copied to clipboard."
+        );
+
+    } catch (error) {
+
         alert(text);
+
     }
+
 });
+
+
+/* =========================================================
+   RENDER COMPLETE RESULT
+========================================================= */
 
 function renderResult(data) {
 
-    document.getElementById("resultSubtitle").textContent =
+    document
+        .getElementById("resultSubtitle")
+        .textContent =
         "Your resume has been analyzed successfully.";
+
 
     setOverallScore(
         data.score,
@@ -136,256 +448,934 @@ function renderResult(data) {
         data.summary
     );
 
-    setMetric("structure", data.breakdown.structure, 20);
-    setMetric("skills", data.breakdown.skills, 20);
-    setMetric("tech", data.breakdown.technologies, 20);
-    setMetric("projects", data.breakdown.projects, 20);
-    setMetric("experience", data.breakdown.experience, 20);
-    setMetric("education", data.breakdown.education, 10);
-    setMetric("keywords", data.breakdown.keywords, 10);
-    setMetric("formatting", data.breakdown.formatting, 10);
 
-    document.getElementById("profileName").textContent =
+    const breakdown =
+        data.breakdown || {};
+
+
+    setMetric(
+        "structure",
+        breakdown.structure,
+        20
+    );
+
+
+    setMetric(
+        "skills",
+        breakdown.skills,
+        20
+    );
+
+
+    setMetric(
+        "tech",
+        breakdown.technologies,
+        20
+    );
+
+
+    setMetric(
+        "projects",
+        breakdown.projects,
+        20
+    );
+
+
+    setMetric(
+        "experience",
+        breakdown.experience,
+        20
+    );
+
+
+    setMetric(
+        "education",
+        breakdown.education,
+        10
+    );
+
+
+    setMetric(
+        "keywords",
+        breakdown.keywords,
+        10
+    );
+
+
+    setMetric(
+        "formatting",
+        breakdown.formatting,
+        10
+    );
+
+
+    /* Candidate Snapshot */
+
+    document
+        .getElementById("profileName")
+        .textContent =
         "ATS Evaluation Report";
 
-    document.getElementById("profileRole").textContent =
-        `${data.target_field} | ${data.candidate_type}`;
 
-    document.getElementById("profileMeta").textContent =
-        `Resume: ${data.filename}`;
+    document
+        .getElementById("profileRole")
+        .textContent =
+        `${data.target_field || targetField.value} | ${
+            data.candidate_type ||
+            candidateType.value
+        }`;
 
-    document.getElementById("mncChance").textContent =
-        `${data.mnc_chance}%`;
 
-    document.getElementById("mncLabel").textContent =
-        data.mnc_label;
+    document
+        .getElementById("profileMeta")
+        .textContent =
+        `Resume: ${
+            data.filename ||
+            resumeInput.files[0]?.name ||
+            "Uploaded Resume"
+        }`;
 
-    document.getElementById("mncText").textContent =
-        data.mnc_message;
 
-    renderList("matchedSkills", data.matched_skills);
-    renderList("missingSkills", data.missing_skills);
-    renderList("keyStrengths", data.key_strengths);
+    /* MNC Readiness */
 
-    renderFieldMatches(data.field_matches);
+    document
+        .getElementById("mncChance")
+        .textContent =
+        `${Number(data.mnc_chance || 0)}%`;
+
+
+    document
+        .getElementById("mncLabel")
+        .textContent =
+        data.mnc_label ||
+        "Readiness Result";
+
+
+    document
+        .getElementById("mncText")
+        .textContent =
+        data.mnc_message ||
+        "Your MNC readiness has been calculated.";
+
+
+    /* Skills */
+
+    renderList(
+        "matchedSkills",
+        data.matched_skills
+    );
+
+
+    renderList(
+        "missingSkills",
+        data.missing_skills
+    );
+
+
+    renderList(
+        "keyStrengths",
+        data.key_strengths
+    );
+
+
+    /* Career Match */
+
+    renderFieldMatches(
+        data.field_matches
+    );
+
+
+    /* Score Table */
+
     renderTable(data);
-    renderRoadmap(data.roadmap);
 
-    document.getElementById("finalVerdict").textContent =
-        data.verdict;
 
-    document.getElementById("finalAdvice").textContent =
-        data.final_advice;
+    /* Roadmap */
 
-    document.getElementById("finalGrade").textContent =
-        data.grade;
+    renderRoadmap(
+        data.roadmap
+    );
 
-    document.getElementById("resultPanel")
-        .scrollIntoView({ behavior: "smooth" });
+
+    /* Final Verdict */
+
+    document
+        .getElementById("finalVerdict")
+        .textContent =
+        data.verdict ||
+        "Analysis Completed";
+
+
+    document
+        .getElementById("finalAdvice")
+        .textContent =
+        data.final_advice ||
+        data.summary ||
+        "Review the report and improve weak sections.";
+
+
+    document
+        .getElementById("finalGrade")
+        .textContent =
+        data.grade ||
+        "--";
+
+
+    /* Scroll To Results */
+
+    document
+        .getElementById("resultPanel")
+        .scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
 }
 
-function setOverallScore(score, grade, verdict, summary) {
 
-    const degree = Math.round((score / 100) * 360);
+/* =========================================================
+   OVERALL SCORE
+========================================================= */
 
-    document.getElementById("overallRing").style.background =
-        `conic-gradient(#22c55e 0deg, #2563eb ${degree}deg, #e8eef9 ${degree}deg)`;
+function setOverallScore(
+    score,
+    grade,
+    verdict,
+    summary
+) {
 
-    document.getElementById("overallScore").textContent =
-        `${score}%`;
+    const safeScore =
+        clamp(
+            Number(score) || 0,
+            0,
+            100
+        );
 
-    document.getElementById("gradeText").textContent =
-        `${grade} • ${verdict}`;
 
-    document.getElementById("scoreMessage").textContent =
-        summary;
+    const degree =
+        Math.round(
+            safeScore * 3.6
+        );
 
-    document.querySelector(".mini-ring").style.background =
-        `conic-gradient(#22c55e ${degree}deg, rgba(255,255,255,0.25) ${degree}deg)`;
 
-    document.querySelector(".mini-ring span").textContent =
-        `${score}%`;
-}
+    const overallRing =
+        document.getElementById(
+            "overallRing"
+        );
 
-function setMetric(prefix, value, max) {
 
-    const degree = Math.round((value / max) * 360);
-    const percentage = Math.round((value / max) * 100);
+    overallRing.style.background = `
+        conic-gradient(
+            #5b5cf0 0deg,
+            #23c4d8 ${degree}deg,
+            #e8edf5 ${degree}deg
+        )
+    `;
 
-    document.getElementById(`${prefix}Ring`).style.background =
-        `conic-gradient(#2563eb ${degree}deg, #e8eef9 ${degree}deg)`;
 
-    document.getElementById(`${prefix}Score`).textContent =
-        `${value}/${max}`;
+    document
+        .getElementById("overallScore")
+        .textContent =
+        `${safeScore}%`;
 
-    let status = "Needs Work";
 
-    if (percentage >= 85) {
-        status = "Excellent";
-    } else if (percentage >= 70) {
-        status = "Great";
-    } else if (percentage >= 55) {
-        status = "Good";
+    document
+        .getElementById("gradeText")
+        .textContent =
+        `${grade || "--"} • ${
+            verdict ||
+            "Analysis Completed"
+        }`;
+
+
+    document
+        .getElementById("scoreMessage")
+        .textContent =
+        summary ||
+        "Resume analysis completed successfully.";
+
+
+    /* Hero Score Ring */
+
+    const miniRing =
+        document.querySelector(
+            ".mini-ring"
+        );
+
+
+    if (miniRing) {
+
+        miniRing.style.background = `
+            conic-gradient(
+                #7778ff 0deg,
+                #23c4d8 ${degree}deg,
+                rgba(255,255,255,.13)
+                ${degree}deg
+            )
+        `;
+
+
+        const miniScore =
+            miniRing.querySelector("span");
+
+
+        if (miniScore) {
+
+            miniScore.textContent =
+                `${safeScore}%`;
+
+        }
+
     }
 
-    document.getElementById(`${prefix}Status`).textContent =
-        status;
 }
 
-function renderList(id, items) {
 
-    const ul = document.getElementById(id);
+/* =========================================================
+   INDIVIDUAL SCORE
+========================================================= */
 
-    ul.innerHTML = "";
+function setMetric(
+    prefix,
+    value,
+    maxScore
+) {
 
-    if (!items || items.length === 0) {
+    const safeValue =
+        clamp(
+            Number(value) || 0,
+            0,
+            maxScore
+        );
 
-        const li = document.createElement("li");
-        li.textContent = "No data found";
-        ul.appendChild(li);
 
+    const percentage =
+        Math.round(
+            (
+                safeValue /
+                maxScore
+            ) *
+            100
+        );
+
+
+    const degree =
+        Math.round(
+            percentage * 3.6
+        );
+
+
+    const ring =
+        document.getElementById(
+            `${prefix}Ring`
+        );
+
+
+    const score =
+        document.getElementById(
+            `${prefix}Score`
+        );
+
+
+    const status =
+        document.getElementById(
+            `${prefix}Status`
+        );
+
+
+    if (ring) {
+
+        ring.style.background = `
+            conic-gradient(
+                #5b5cf0 0deg,
+                #2878eb ${degree}deg,
+                #e8edf5 ${degree}deg
+            )
+        `;
+
+    }
+
+
+    if (score) {
+
+        score.textContent =
+            `${safeValue}/${maxScore}`;
+
+    }
+
+
+    if (status) {
+
+        status.textContent =
+            getPerformance(
+                percentage
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   LIST RENDERING
+========================================================= */
+
+function renderList(
+    elementId,
+    items
+) {
+
+    const list =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!list) {
         return;
     }
 
-    items.slice(0, 10).forEach(item => {
 
-        const li = document.createElement("li");
-        li.textContent = item;
+    list.innerHTML = "";
 
-        ul.appendChild(li);
-    });
+
+    if (
+        !Array.isArray(items) ||
+        items.length === 0
+    ) {
+
+        const item =
+            document.createElement("li");
+
+
+        item.textContent =
+            "No data available";
+
+
+        list.appendChild(item);
+
+
+        return;
+
+    }
+
+
+    items
+        .slice(0, 12)
+        .forEach((value) => {
+
+            const item =
+                document.createElement("li");
+
+
+            item.textContent =
+                String(value);
+
+
+            list.appendChild(item);
+
+        });
+
 }
+
+
+/* =========================================================
+   FIELD MATCHES
+========================================================= */
 
 function renderFieldMatches(matches) {
 
-    const bestField = document.getElementById("bestField");
-    const bestFieldPercent = document.getElementById("bestFieldPercent");
-    const fieldMatches = document.getElementById("fieldMatches");
+    const bestField =
+        document.getElementById(
+            "bestField"
+        );
 
-    fieldMatches.innerHTML = "";
 
-    if (!matches || matches.length === 0) {
+    const bestFieldPercent =
+        document.getElementById(
+            "bestFieldPercent"
+        );
 
-        bestField.textContent = "Not Analyzed";
-        bestFieldPercent.textContent = "0% Match";
 
-        return;
-    }
+    const container =
+        document.getElementById(
+            "fieldMatches"
+        );
 
-    bestField.textContent = matches[0].field;
 
-    bestFieldPercent.textContent =
-        `${matches[0].match}% Match`;
+    container.innerHTML = "";
 
-    matches.slice(0, 4).forEach(item => {
 
-        const row = document.createElement("div");
+    if (
+        !Array.isArray(matches) ||
+        matches.length === 0
+    ) {
 
-        row.className = "field-row";
+        bestField.textContent =
+            "Not Available";
 
-        row.innerHTML = `
-            <span>${item.field}</span>
-            <span>${item.match}%</span>
+
+        bestFieldPercent.textContent =
+            "0% Match";
+
+
+        container.innerHTML = `
+            <p>
+                Career field match data
+                is not available.
+            </p>
         `;
 
-        fieldMatches.appendChild(row);
-    });
+
+        return;
+
+    }
+
+
+    const sortedMatches =
+        [...matches].sort(
+            (a, b) =>
+                Number(b.match || 0) -
+                Number(a.match || 0)
+        );
+
+
+    const best =
+        sortedMatches[0];
+
+
+    bestField.textContent =
+        best.field ||
+        "Best Match";
+
+
+    bestFieldPercent.textContent =
+        `${Number(best.match || 0)}% Match`;
+
+
+    sortedMatches
+        .slice(0, 5)
+        .forEach((item) => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "field-row";
+
+
+            const name =
+                document.createElement(
+                    "span"
+                );
+
+
+            name.textContent =
+                item.field ||
+                "Unknown Field";
+
+
+            const score =
+                document.createElement(
+                    "span"
+                );
+
+
+            score.textContent =
+                `${Number(
+                    item.match || 0
+                )}%`;
+
+
+            row.appendChild(name);
+            row.appendChild(score);
+
+
+            container.appendChild(row);
+
+        });
+
 }
+
+
+/* =========================================================
+   SCORE TABLE
+========================================================= */
 
 function renderTable(data) {
 
+    const breakdown =
+        data.breakdown || {};
+
+
     const rows = [
-        ["Resume Structure", data.breakdown.structure, 20],
-        ["Skills", data.breakdown.skills, 20],
-        ["Technologies", data.breakdown.technologies, 20],
-        ["Projects", data.breakdown.projects, 20],
-        ["Experience", data.breakdown.experience, 20],
-        ["Education", data.breakdown.education, 10],
-        ["Keywords", data.breakdown.keywords, 10],
-        ["Formatting & Readability", data.breakdown.formatting, 10]
+
+        [
+            "Resume Structure",
+            breakdown.structure,
+            20
+        ],
+
+        [
+            "Skills",
+            breakdown.skills,
+            20
+        ],
+
+        [
+            "Technologies",
+            breakdown.technologies,
+            20
+        ],
+
+        [
+            "Projects",
+            breakdown.projects,
+            20
+        ],
+
+        [
+            "Experience",
+            breakdown.experience,
+            20
+        ],
+
+        [
+            "Education",
+            breakdown.education,
+            10
+        ],
+
+        [
+            "Keywords",
+            breakdown.keywords,
+            10
+        ],
+
+        [
+            "Formatting & Readability",
+            breakdown.formatting,
+            10
+        ]
+
     ];
 
-    const tbody = document.getElementById("scoreTable");
+
+    const tbody =
+        document.getElementById(
+            "scoreTable"
+        );
+
 
     tbody.innerHTML = "";
 
-    rows.forEach(row => {
 
-        const percentage =
-            Math.round((row[1] / row[2]) * 100);
+    rows.forEach(
+        ([section, value, max]) => {
 
-        const performance =
-            getPerformance(percentage);
+            const score =
+                Number(value) || 0;
 
-        const tr = document.createElement("tr");
 
-        tr.innerHTML = `
-            <td>${row[0]}</td>
-            <td>${row[1]}</td>
-            <td>${row[2]}</td>
-            <td>${percentage}%</td>
-            <td>${performance}</td>
-        `;
+            const percentage =
+                Math.round(
+                    (
+                        score /
+                        max
+                    ) *
+                    100
+                );
 
-        tbody.appendChild(tr);
-    });
 
-    const totalRow = document.createElement("tr");
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+                <td>
+                    ${escapeHtml(section)}
+                </td>
+
+                <td>
+                    ${score}
+                </td>
+
+                <td>
+                    ${max}
+                </td>
+
+                <td>
+                    ${percentage}%
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        getPerformance(
+                            percentage
+                        )
+                    )}
+                </td>
+            `;
+
+
+            tbody.appendChild(row);
+
+        }
+    );
+
+
+    /* Total Row */
+
+    const totalObtained =
+        Number(
+            data.total_obtained
+        ) || 0;
+
+
+    const totalMarks =
+        Number(
+            data.total_marks
+        ) || 130;
+
+
+    const totalRow =
+        document.createElement("tr");
+
 
     totalRow.innerHTML = `
-        <td><b>Total</b></td>
-        <td><b>${data.total_obtained}</b></td>
-        <td><b>${data.total_marks}</b></td>
-        <td><b>${data.score}%</b></td>
-        <td><b>${data.verdict}</b></td>
+
+        <td>
+            <strong>
+                Total
+            </strong>
+        </td>
+
+        <td>
+            <strong>
+                ${totalObtained}
+            </strong>
+        </td>
+
+        <td>
+            <strong>
+                ${totalMarks}
+            </strong>
+        </td>
+
+        <td>
+            <strong>
+                ${Number(data.score || 0)}%
+            </strong>
+        </td>
+
+        <td>
+            <strong>
+                ${escapeHtml(
+                    data.verdict ||
+                    "Completed"
+                )}
+            </strong>
+        </td>
+
     `;
 
+
     tbody.appendChild(totalRow);
+
 }
+
+
+/* =========================================================
+   ROADMAP
+========================================================= */
 
 function renderRoadmap(roadmap) {
 
-    const ol = document.getElementById("roadmapList");
+    const list =
+        document.getElementById(
+            "roadmapList"
+        );
 
-    ol.innerHTML = "";
 
-    if (!roadmap || roadmap.length === 0) {
+    list.innerHTML = "";
 
-        const li = document.createElement("li");
-        li.textContent = "No roadmap available.";
 
-        ol.appendChild(li);
+    if (
+        !Array.isArray(roadmap) ||
+        roadmap.length === 0
+    ) {
+
+        const item =
+            document.createElement("li");
+
+
+        item.textContent =
+            "No improvement roadmap available.";
+
+
+        list.appendChild(item);
+
 
         return;
+
     }
 
-    roadmap.forEach(item => {
 
-        const li = document.createElement("li");
+    roadmap.forEach((step) => {
 
-        li.textContent = item;
+        const item =
+            document.createElement("li");
 
-        ol.appendChild(li);
+
+        item.textContent =
+            String(step);
+
+
+        list.appendChild(item);
+
     });
+
 }
+
+
+/* =========================================================
+   PERFORMANCE LABEL
+========================================================= */
 
 function getPerformance(percentage) {
 
-    if (percentage >= 85) {
+    if (percentage >= 90) {
         return "Excellent";
     }
 
-    if (percentage >= 70) {
+
+    if (percentage >= 80) {
         return "Very Good";
     }
 
-    if (percentage >= 55) {
+
+    if (percentage >= 70) {
         return "Good";
     }
 
+
+    if (percentage >= 55) {
+        return "Average";
+    }
+
+
     return "Needs Work";
+
 }
+
+
+/* =========================================================
+   CLAMP NUMBER
+========================================================= */
+
+function clamp(
+    number,
+    min,
+    max
+) {
+
+    return Math.min(
+        Math.max(
+            number,
+            min
+        ),
+        max
+    );
+
+}
+
+
+/* =========================================================
+   SAFE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    )
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   ACTIVE SIDEBAR NAVIGATION
+========================================================= */
+
+const navLinks =
+    document.querySelectorAll(
+        ".nav-link"
+    );
+
+
+navLinks.forEach((link) => {
+
+    link.addEventListener(
+        "click",
+        () => {
+
+            navLinks.forEach(
+                (item) => {
+                    item.classList.remove(
+                        "active"
+                    );
+                }
+            );
+
+
+            link.classList.add(
+                "active"
+            );
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
 
 checkServer();
 
-setInterval(checkServer, 5000);
+
+setInterval(
+    checkServer,
+    5000
+);

@@ -1,396 +1,1301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07111f">
     <title>ATSLens - AI Powered ATS Resume Analyzer</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app">
+<div class="app-shell">
 
     <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-logo">ATS</div>
-            <div>
-                <h1>ATSLens</h1>
-                <p>AI Resume Analyzer</p>
-            </div>
-        </div>
 
-        <nav class="nav">
-            <a class="active" href="#">Dashboard</a>
-            <a href="#analysisForm">New Analysis</a>
-            <a href="#resultPanel">Result</a>
-            <a href="#roadmapBox">Roadmap</a>
-            <a href="#aboutBox">About</a>
+        <a class="brand" href="#top">
+            <span class="brand-mark">A</span>
+
+            <span class="brand-text">
+                <strong>ATSLens</strong>
+                <small>Resume Intelligence</small>
+            </span>
+        </a>
+
+        <div class="nav-label">Workspace</div>
+
+        <nav class="side-nav">
+
+            <a class="nav-link active" href="#top">
+                <span>01</span>
+                Dashboard
+            </a>
+
+            <a class="nav-link" href="#analysisForm">
+                <span>02</span>
+                New Analysis
+            </a>
+
+            <a class="nav-link" href="#resultPanel">
+                <span>03</span>
+                Results
+            </a>
+
+            <a class="nav-link" href="#roadmapBox">
+                <span>04</span>
+                Roadmap
+            </a>
+
+            <a class="nav-link" href="#aboutBox">
+                <span>05</span>
+                Verdict
+            </a>
+
         </nav>
 
-        <div class="help-card">
-            <div class="help-icon">AI</div>
-            <h3>Smart ATS</h3>
-            <p>Analyze resume score, field fit, skills gap, and MNC readiness.</p>
+        <div class="sidebar-card">
+
+            <div class="sidebar-card-icon">AI</div>
+
+            <span class="sidebar-card-label">
+                Resume Intelligence
+            </span>
+
+            <h3>
+                One workspace. Full ATS view.
+            </h3>
+
+            <p>
+                Score your resume, identify skill gaps,
+                check field fit and export a professional report.
+            </p>
+
         </div>
+
+        <div class="sidebar-footer">
+            <span class="live-dot"></span>
+            <span>ATSLens Workspace</span>
+        </div>
+
     </aside>
 
-    <main class="main">
+
+    <main class="main" id="top">
 
         <header class="topbar">
-            <div>
-                <h2>AI Powered ATS Resume Analyzer</h2>
-                <p>Professional resume scoring, career guidance, and PDF report.</p>
-            </div>
 
-            <div id="serverStatus" class="server offline">Server Offline</div>
-        </header>
-
-        <section class="hero">
             <div>
-                <span class="tag">AI Powered</span>
-                <h1>Analyze Your Resume Like a Professional ATS System</h1>
+                <span class="eyebrow">
+                    Resume Intelligence Workspace
+                </span>
+
+                <h1>ATS Resume Analyzer</h1>
+
                 <p>
-                    Upload your resume, select your target career field, paste job description,
-                    and get detailed ATS marksheet with individual scores, MNC readiness,
-                    missing skills, and learning roadmap.
+                    Professional resume scoring,
+                    career alignment and readiness analysis.
                 </p>
             </div>
 
-            <div class="hero-score">
+            <div
+                id="serverStatus"
+                class="server-status offline"
+            >
+                <span class="status-dot"></span>
+                <span>Server Offline</span>
+            </div>
+
+        </header>
+
+
+        <section class="hero">
+
+            <div class="hero-copy">
+
+                <div class="hero-badges">
+                    <span>AI Powered</span>
+                    <span>ATS Intelligence</span>
+                </div>
+
+                <h2>
+                    Build a resume that is ready for
+                    <em>shortlisting.</em>
+                </h2>
+
+                <p>
+                    Upload your resume, choose the target profile
+                    and compare it against a job description.
+
+                    ATSLens turns the result into a structured
+                    scorecard, skills gap analysis, field match,
+                    MNC readiness estimate and improvement roadmap.
+                </p>
+
+                <div class="hero-stats">
+
+                    <div>
+                        <strong>8</strong>
+                        <span>Scoring areas</span>
+                    </div>
+
+                    <div>
+                        <strong>130</strong>
+                        <span>Total marks</span>
+                    </div>
+
+                    <div>
+                        <strong>PDF</strong>
+                        <span>Export report</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-score-card">
+
+                <span class="score-caption">
+                    Live ATS Index
+                </span>
+
                 <div class="mini-ring">
                     <span>0%</span>
                 </div>
-                <p>Ready for Analysis</p>
-            </div>
-        </section>
 
-        <section id="analysisForm" class="grid input-grid">
+                <strong>
+                    Ready for analysis
+                </strong>
 
-            <div class="card form-card">
-                <div class="section-title">
-                    <h2>Resume Analysis Form</h2>
-                    <p>Fill details before analyzing your resume.</p>
-                </div>
+                <p>
+                    Your ATS index updates after a successful scan.
+                </p>
 
-                <div class="two-col">
-                    <div>
-                        <label>Candidate Type</label>
-                        <select id="candidateType">
-                            <option value="Fresher">Fresher</option>
-                            <option value="Experienced">Experienced</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label>Target Company Type</label>
-                        <select id="targetCompany">
-                            <option value="MNC">MNC</option>
-                            <option value="Product Based">Product Based</option>
-                            <option value="Service Based">Service Based</option>
-                            <option value="Startup">Startup</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="two-col">
-                    <div>
-                        <label>Target Field</label>
-                        <select id="targetField">
-                            <option value="Software Engineer">Software Engineer</option>
-                            <option value="AI/ML Engineer">AI/ML Engineer</option>
-                            <option value="Data Analyst">Data Analyst</option>
-                            <option value="Web Developer">Web Developer</option>
-                            <option value="Backend Developer">Backend Developer</option>
-                            <option value="Full Stack Developer">Full Stack Developer</option>
-                            <option value="Data Engineer">Data Engineer</option>
-                            <option value="Cloud Engineer">Cloud Engineer</option>
-                            <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label>Years of Experience</label>
-                        <input id="experienceYears" type="number" min="0" value="0" />
-                    </div>
-                </div>
-
-                <label>Preferred Role</label>
-                <input id="preferredRole" type="text" placeholder="Example: Backend Developer, AI/ML Engineer" />
-
-                <label>Upload Resume</label>
-                <div class="upload-box">
-                    <input id="resumeInput" type="file" accept=".pdf,.docx,.txt" />
-                    <p id="fileName">PDF, DOCX, or TXT supported</p>
-                </div>
-
-                <label>Job Description</label>
-                <textarea id="jobDescription" placeholder="Paste job description here..."></textarea>
-
-                <button type="button" id="analyzeBtn">Analyze Resume</button>
-            </div>
-
-            <div class="card info-card">
-                <h2>What You Will Get</h2>
-
-                <div class="info-item purple">
-                    <span>01</span>
-                    <div>
-                        <h3>Overall ATS Score</h3>
-                        <p>Total score based on resume and job description matching.</p>
-                    </div>
-                </div>
-
-                <div class="info-item blue">
-                    <span>02</span>
-                    <div>
-                        <h3>Individual Scores</h3>
-                        <p>Structure, skills, technologies, projects, experience, keywords, and formatting.</p>
-                    </div>
-                </div>
-
-                <div class="info-item green">
-                    <span>03</span>
-                    <div>
-                        <h3>MNC Readiness</h3>
-                        <p>Estimated chance of getting shortlisted based on resume quality.</p>
-                    </div>
-                </div>
-
-                <div class="info-item orange">
-                    <span>04</span>
-                    <div>
-                        <h3>PDF Marksheet</h3>
-                        <p>Download a professional ATS report in PDF format.</p>
-                    </div>
-                </div>
             </div>
 
         </section>
 
-        <section id="resultPanel" class="result-panel">
 
-            <div class="result-header">
+        <section class="section-intro">
+
+            <div>
+                <span class="eyebrow">Step 01</span>
+
+                <h2>
+                    Configure your analysis
+                </h2>
+            </div>
+
+            <p>
+                Use accurate profile details and the complete
+                job description for a more relevant comparison.
+            </p>
+
+        </section>
+
+
+        <section
+            id="analysisForm"
+            class="analysis-layout"
+        >
+
+            <div class="panel form-panel">
+
+                <div class="panel-heading">
+
+                    <div>
+                        <span class="panel-kicker">
+                            Analysis Setup
+                        </span>
+
+                        <h2>
+                            Resume Analysis Form
+                        </h2>
+                    </div>
+
+                    <p>
+                        Complete the profile information
+                        before starting the ATS analysis.
+                    </p>
+
+                </div>
+
+
+                <div class="form-block">
+
+                    <div class="form-block-title">
+
+                        <span>01</span>
+
+                        <div>
+                            <h3>Target profile</h3>
+
+                            <p>
+                                Define the type of role
+                                and company you are targeting.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="field-grid two-columns">
+
+                        <div class="field">
+
+                            <label for="candidateType">
+                                Candidate Type
+                            </label>
+
+                            <select id="candidateType">
+
+                                <option value="Fresher">
+                                    Fresher
+                                </option>
+
+                                <option value="Experienced">
+                                    Experienced
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="targetCompany">
+                                Target Company Type
+                            </label>
+
+                            <select id="targetCompany">
+
+                                <option value="MNC">
+                                    MNC
+                                </option>
+
+                                <option value="Product Based">
+                                    Product Based
+                                </option>
+
+                                <option value="Service Based">
+                                    Service Based
+                                </option>
+
+                                <option value="Startup">
+                                    Startup
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field-grid two-columns">
+
+                        <div class="field">
+
+                            <label for="targetField">
+                                Target Field
+                            </label>
+
+                            <select id="targetField">
+
+                                <option value="Software Engineer">
+                                    Software Engineer
+                                </option>
+
+                                <option value="AI/ML Engineer">
+                                    AI/ML Engineer
+                                </option>
+
+                                <option value="Data Analyst">
+                                    Data Analyst
+                                </option>
+
+                                <option value="Web Developer">
+                                    Web Developer
+                                </option>
+
+                                <option value="Backend Developer">
+                                    Backend Developer
+                                </option>
+
+                                <option value="Full Stack Developer">
+                                    Full Stack Developer
+                                </option>
+
+                                <option value="Data Engineer">
+                                    Data Engineer
+                                </option>
+
+                                <option value="Cloud Engineer">
+                                    Cloud Engineer
+                                </option>
+
+                                <option value="Cybersecurity Analyst">
+                                    Cybersecurity Analyst
+                                </option>
+
+                                <option value="Human Resource Generalist">
+                                    Human Resource Generalist
+                                </option>
+
+                                <option value="Human Resource Assciate">
+                                    Human Resource Assciate
+                                </option>
+
+                                <option value="Human Resource Manager">
+                                    Human Resource Manager
+                                </option>
+
+                                <option value="Human Resource Busniness Partner">
+                                    Human Resource Busniness Partner
+                                </option>
+
+                                <option value="Human Resource Assistant Manager">
+                                    Human Resource Assistant Manager
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="experienceYears">
+                                Years of Experience
+                            </label>
+
+                            <input
+                                id="experienceYears"
+                                type="number"
+                                min="0"
+                                value="0"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="preferredRole">
+                            Preferred Role
+                        </label>
+
+                        <input
+                            id="preferredRole"
+                            type="text"
+                            placeholder="Example: Backend Developer, AI/ML Engineer"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-block separated">
+
+                    <div class="form-block-title">
+
+                        <span>02</span>
+
+                        <div>
+
+                            <h3>
+                                Resume & Job Context
+                            </h3>
+
+                            <p>
+                                Upload the resume and paste the
+                                job description you want to target.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="resumeInput">
+                            Upload Resume
+                        </label>
+
+                        <label
+                            class="upload-box"
+                            for="resumeInput"
+                        >
+
+                            <input
+                                id="resumeInput"
+                                type="file"
+                                accept=".pdf,.docx,.txt"
+                            >
+
+                            <span class="upload-icon">
+                                ↑
+                            </span>
+
+                            <span class="upload-content">
+
+                                <strong>
+                                    Choose your resume file
+                                </strong>
+
+                                <small id="fileName">
+                                    PDF, DOCX, or TXT supported
+                                </small>
+
+                            </span>
+
+                            <span class="upload-button">
+                                Browse file
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="jobDescription">
+                            Job Description
+                        </label>
+
+                        <textarea
+                            id="jobDescription"
+                            placeholder="Paste job description here..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="analyzeBtn"
+                    class="primary-button"
+                    type="button"
+                >
+
+                    <span class="button-icon">
+                        ✦
+                    </span>
+
+                    <span>
+                        Analyze Resume
+                    </span>
+
+                    <span class="button-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <aside class="analysis-aside">
+
+                <div class="panel output-panel">
+
+                    <span class="panel-kicker">
+                        Analysis Output
+                    </span>
+
+                    <h2>
+                        What you will get
+                    </h2>
+
+                    <p class="panel-description">
+                        A structured report based on your
+                        ATSLens scoring system.
+                    </p>
+
+
+                    <div class="output-item">
+
+                        <span>01</span>
+
+                        <div>
+
+                            <h3>
+                                Overall ATS Score
+                            </h3>
+
+                            <p>
+                                Resume-to-role readiness
+                                score and grade.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="output-item">
+
+                        <span>02</span>
+
+                        <div>
+
+                            <h3>
+                                Individual Scores
+                            </h3>
+
+                            <p>
+                                Detailed marks across all
+                                eight scoring dimensions.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="output-item">
+
+                        <span>03</span>
+
+                        <div>
+
+                            <h3>
+                                MNC Readiness
+                            </h3>
+
+                            <p>
+                                Estimated shortlisting
+                                readiness from your analysis.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="output-item">
+
+                        <span>04</span>
+
+                        <div>
+
+                            <h3>
+                                PDF Marksheet
+                            </h3>
+
+                            <p>
+                                Download the report generated
+                                by your backend.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="insight-panel">
+
+                    <span>
+                        ATSLens Insight
+                    </span>
+
+                    <h3>
+                        Better inputs produce a
+                        more useful comparison.
+                    </h3>
+
+                    <p>
+                        Use your latest resume and the complete
+                        job description before running the scan.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+
+
+        <section
+            id="resultPanel"
+            class="results-section"
+        >
+
+            <div class="section-intro result-intro">
+
                 <div>
-                    <h2>Analysis Result</h2>
-                    <p id="resultSubtitle">Run an analysis to see your resume performance.</p>
+
+                    <span class="eyebrow">
+                        Step 02
+                    </span>
+
+                    <h2>
+                        ATS intelligence report
+                    </h2>
+
+                    <p id="resultSubtitle">
+                        Run an analysis to see your
+                        resume performance.
+                    </p>
+
                 </div>
 
-                <div class="actions">
-                    <button type="button" id="shareBtn" class="outline-btn">Share Report</button>
-                    <button type="button" id="downloadBtn" class="pdf-btn" disabled>Download PDF</button>
-                </div>
-            </div>
 
-            <div class="result-grid">
+                <div class="result-actions">
 
-                <div class="card score-card">
-                    <h3>Overall ATS Score</h3>
-                    <div id="overallRing" class="score-ring">
-                        <span id="overallScore">0%</span>
-                        <small id="gradeText">Unrated</small>
-                    </div>
-                    <p id="scoreMessage">Upload your resume and run analysis to see your score.</p>
-                </div>
+                    <button
+                        id="shareBtn"
+                        class="secondary-button"
+                        type="button"
+                    >
+                        Share Report
+                    </button>
 
-                <div class="card breakdown-card">
-                    <h3>Score Breakdown</h3>
 
-                    <div class="breakdown-grid">
-                        <div class="metric teal">
-                            <h4>Structure</h4>
-                            <div class="small-ring" id="structureRing">
-                                <span id="structureScore">0/20</span>
-                            </div>
-                            <p id="structureStatus">Run analysis</p>
-                        </div>
+                    <button
+                        id="downloadBtn"
+                        class="primary-button compact"
+                        type="button"
+                        disabled
+                    >
+                        Download PDF
+                    </button>
 
-                        <div class="metric blue">
-                            <h4>Skills</h4>
-                            <div class="small-ring" id="skillsRing">
-                                <span id="skillsScore">0/20</span>
-                            </div>
-                            <p id="skillsStatus">Run analysis</p>
-                        </div>
-
-                        <div class="metric orange">
-                            <h4>Technologies</h4>
-                            <div class="small-ring" id="techRing">
-                                <span id="techScore">0/20</span>
-                            </div>
-                            <p id="techStatus">Run analysis</p>
-                        </div>
-
-                        <div class="metric pink">
-                            <h4>Projects</h4>
-                            <div class="small-ring" id="projectsRing">
-                                <span id="projectsScore">0/20</span>
-                            </div>
-                            <p id="projectsStatus">Run analysis</p>
-                        </div>
-
-                        <div class="metric green">
-                            <h4>Experience</h4>
-                            <div class="small-ring" id="experienceRing">
-                                <span id="experienceScore">0/20</span>
-                            </div>
-                            <p id="experienceStatus">Run analysis</p>
-                        </div>
-
-                        <div class="metric violet">
-                            <h4>Education</h4>
-                            <div class="small-ring" id="educationRing">
-                                <span id="educationScore">0/10</span>
-                            </div>
-                            <p id="educationStatus">Run analysis</p>
-                        </div>
-
-                        <div class="metric blue">
-                            <h4>Keywords</h4>
-                            <div class="small-ring" id="keywordsRing">
-                                <span id="keywordsScore">0/10</span>
-                            </div>
-                            <p id="keywordsStatus">Run analysis</p>
-                        </div>
-
-                        <div class="metric pink">
-                            <h4>Formatting</h4>
-                            <div class="small-ring" id="formattingRing">
-                                <span id="formattingScore">0/10</span>
-                            </div>
-                            <p id="formattingStatus">Run analysis</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card profile-card">
-                    <div class="profile-banner">
-                        <div>
-                            <h3 id="profileName">Candidate Report</h3>
-                            <p id="profileRole">Target field will appear here</p>
-                            <p id="profileMeta">Resume: Not uploaded</p>
-                        </div>
-                        <div class="trophy">🏆</div>
-                    </div>
-
-                    <div class="mnc-box">
-                        <div>
-                            <h4>MNC Shortlisting Chance</h4>
-                            <h2 id="mncChance">0%</h2>
-                        </div>
-                        <div>
-                            <h4 id="mncLabel">Not Analyzed</h4>
-                            <p id="mncText">Run analysis to estimate your MNC readiness.</p>
-                        </div>
-                    </div>
                 </div>
 
             </div>
 
-            <div class="lower-grid">
 
-                <div class="card list-card green-list">
-                    <h3>Matched Skills</h3>
+
+            <div class="result-top-grid">
+
+
+                <article class="panel overall-card">
+
+                    <div class="card-title-row">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Primary Metric
+                            </span>
+
+                            <h3>
+                                Overall ATS Score
+                            </h3>
+
+                        </div>
+
+                        <span class="pill">
+                            ATS
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="overallRing"
+                        class="score-ring"
+                    >
+
+                        <div class="score-ring-core">
+
+                            <strong id="overallScore">
+                                0%
+                            </strong>
+
+                            <span id="gradeText">
+                                Unrated
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <p id="scoreMessage">
+                        Upload your resume and run
+                        analysis to see your score.
+                    </p>
+
+                </article>
+
+
+
+                <article class="panel breakdown-card">
+
+                    <div class="card-title-row">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Score Map
+                            </span>
+
+                            <h3>
+                                Score Breakdown
+                            </h3>
+
+                        </div>
+
+                        <span class="pill">
+                            8 Factors
+                        </span>
+
+                    </div>
+
+
+                    <div class="metrics-grid">
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Structure
+                            </h4>
+
+                            <div
+                                id="structureRing"
+                                class="metric-ring"
+                            >
+                                <span id="structureScore">
+                                    0/20
+                                </span>
+                            </div>
+
+                            <p id="structureStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Skills
+                            </h4>
+
+                            <div
+                                id="skillsRing"
+                                class="metric-ring"
+                            >
+                                <span id="skillsScore">
+                                    0/20
+                                </span>
+                            </div>
+
+                            <p id="skillsStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Technologies
+                            </h4>
+
+                            <div
+                                id="techRing"
+                                class="metric-ring"
+                            >
+                                <span id="techScore">
+                                    0/20
+                                </span>
+                            </div>
+
+                            <p id="techStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Projects
+                            </h4>
+
+                            <div
+                                id="projectsRing"
+                                class="metric-ring"
+                            >
+                                <span id="projectsScore">
+                                    0/20
+                                </span>
+                            </div>
+
+                            <p id="projectsStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Experience
+                            </h4>
+
+                            <div
+                                id="experienceRing"
+                                class="metric-ring"
+                            >
+                                <span id="experienceScore">
+                                    0/20
+                                </span>
+                            </div>
+
+                            <p id="experienceStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Education
+                            </h4>
+
+                            <div
+                                id="educationRing"
+                                class="metric-ring"
+                            >
+                                <span id="educationScore">
+                                    0/10
+                                </span>
+                            </div>
+
+                            <p id="educationStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Keywords
+                            </h4>
+
+                            <div
+                                id="keywordsRing"
+                                class="metric-ring"
+                            >
+                                <span id="keywordsScore">
+                                    0/10
+                                </span>
+                            </div>
+
+                            <p id="keywordsStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+                            <h4>
+                                Formatting
+                            </h4>
+
+                            <div
+                                id="formattingRing"
+                                class="metric-ring"
+                            >
+                                <span id="formattingScore">
+                                    0/10
+                                </span>
+                            </div>
+
+                            <p id="formattingStatus">
+                                Run analysis
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+                </article>
+
+
+
+                <article class="panel candidate-card">
+
+                    <div class="candidate-banner">
+
+                        <div>
+
+                            <span class="panel-kicker light">
+                                Candidate Snapshot
+                            </span>
+
+                            <h3 id="profileName">
+                                Candidate Report
+                            </h3>
+
+                            <p id="profileRole">
+                                Target field will appear here
+                            </p>
+
+                            <small id="profileMeta">
+                                Resume: Not uploaded
+                            </small>
+
+                        </div>
+
+
+                        <span class="candidate-badge">
+                            ATS
+                        </span>
+
+                    </div>
+
+
+                    <div class="mnc-layout">
+
+                        <div class="mnc-score">
+
+                            <span>
+                                MNC Shortlisting Chance
+                            </span>
+
+                            <strong id="mncChance">
+                                0%
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <h4 id="mncLabel">
+                                Not Analyzed
+                            </h4>
+
+                            <p id="mncText">
+                                Run analysis to estimate
+                                your MNC readiness.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+
+
+            <div class="insight-grid">
+
+
+                <article
+                    class="panel list-panel success-list"
+                >
+
+                    <div class="list-title">
+
+                        <span>✓</span>
+
+                        <h3>
+                            Matched Skills
+                        </h3>
+
+                    </div>
+
                     <ul id="matchedSkills">
                         <li>No data yet</li>
                     </ul>
-                </div>
 
-                <div class="card list-card red-list">
-                    <h3>Missing Skills</h3>
+                </article>
+
+
+
+                <article
+                    class="panel list-panel danger-list"
+                >
+
+                    <div class="list-title">
+
+                        <span>!</span>
+
+                        <h3>
+                            Missing Skills
+                        </h3>
+
+                    </div>
+
                     <ul id="missingSkills">
                         <li>No data yet</li>
                     </ul>
-                </div>
 
-                <div class="card list-card blue-list">
-                    <h3>Key Strengths</h3>
+                </article>
+
+
+
+                <article
+                    class="panel list-panel strength-list"
+                >
+
+                    <div class="list-title">
+
+                        <span>✦</span>
+
+                        <h3>
+                            Key Strengths
+                        </h3>
+
+                    </div>
+
                     <ul id="keyStrengths">
                         <li>No data yet</li>
                     </ul>
-                </div>
 
-                <div class="card fit-card">
-                    <h3>Best Fit For You</h3>
-                    <h2 id="bestField">Not Analyzed</h2>
-                    <p id="bestFieldPercent">0% Match</p>
-                    <div id="fieldMatches" class="field-list">
-                        <p>Run analysis to see career field matches.</p>
+                </article>
+
+
+
+                <article class="panel fit-panel">
+
+                    <span class="panel-kicker">
+                        Career Alignment
+                    </span>
+
+                    <h3>
+                        Best Fit For You
+                    </h3>
+
+
+                    <div class="best-fit">
+
+                        <strong id="bestField">
+                            Not Analyzed
+                        </strong>
+
+                        <span id="bestFieldPercent">
+                            0% Match
+                        </span>
+
                     </div>
-                </div>
+
+
+                    <div
+                        id="fieldMatches"
+                        class="field-matches"
+                    >
+
+                        <p>
+                            Run analysis to see
+                            career field matches.
+                        </p>
+
+                    </div>
+
+                </article>
 
             </div>
 
-            <div class="wide-grid">
 
-                <div class="card table-card">
-                    <h3>Detailed Score Analysis</h3>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Section</th>
-                                <th>Score</th>
-                                <th>Max Score</th>
-                                <th>Percentage</th>
-                                <th>Performance</th>
-                            </tr>
-                        </thead>
-                        <tbody id="scoreTable">
-                            <tr>
-                                <td>Resume Structure</td>
-                                <td>0</td>
-                                <td>20</td>
-                                <td>0%</td>
-                                <td>Pending</td>
-                            </tr>
-                            <tr>
-                                <td>Skills</td>
-                                <td>0</td>
-                                <td>20</td>
-                                <td>0%</td>
-                                <td>Pending</td>
-                            </tr>
-                            <tr>
-                                <td>Technologies</td>
-                                <td>0</td>
-                                <td>20</td>
-                                <td>0%</td>
-                                <td>Pending</td>
-                            </tr>
-                            <tr>
-                                <td>Projects</td>
-                                <td>0</td>
-                                <td>20</td>
-                                <td>0%</td>
-                                <td>Pending</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="details-grid">
 
-                <div id="roadmapBox" class="card roadmap-card">
-                    <h3>Recommended Roadmap</h3>
+
+                <article class="panel table-panel">
+
+                    <div class="card-title-row">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Performance Matrix
+                            </span>
+
+                            <h3>
+                                Detailed Score Analysis
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="table-scroll">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Section</th>
+                                    <th>Score</th>
+                                    <th>Max Score</th>
+                                    <th>Percentage</th>
+                                    <th>Performance</th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="scoreTable">
+
+                                <tr>
+                                    <td>Resume Structure</td>
+                                    <td>0</td>
+                                    <td>20</td>
+                                    <td>0%</td>
+                                    <td>Pending</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Skills</td>
+                                    <td>0</td>
+                                    <td>20</td>
+                                    <td>0%</td>
+                                    <td>Pending</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Technologies</td>
+                                    <td>0</td>
+                                    <td>20</td>
+                                    <td>0%</td>
+                                    <td>Pending</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Projects</td>
+                                    <td>0</td>
+                                    <td>20</td>
+                                    <td>0%</td>
+                                    <td>Pending</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </article>
+
+
+
+                <article
+                    id="roadmapBox"
+                    class="panel roadmap-panel"
+                >
+
+                    <span class="panel-kicker">
+                        Next Actions
+                    </span>
+
+                    <h3>
+                        Recommended Roadmap
+                    </h3>
+
                     <ol id="roadmapList">
-                        <li>Run analysis to get your learning roadmap.</li>
+
+                        <li>
+                            Run analysis to get
+                            your learning roadmap.
+                        </li>
+
                     </ol>
-                </div>
+
+                </article>
+
 
             </div>
 
-            <div id="aboutBox" class="card final-card">
+
+
+            <article
+                id="aboutBox"
+                class="final-panel"
+            >
+
                 <div>
-                    <h3>Final Verdict</h3>
-                    <h2 id="finalVerdict">Waiting for Analysis</h2>
-                    <p id="finalAdvice">Your detailed recommendation will appear after analysis.</p>
+
+                    <span class="panel-kicker light">
+                        ATSLens Recommendation
+                    </span>
+
+                    <h3>
+                        Final Verdict
+                    </h3>
+
+                    <h2 id="finalVerdict">
+                        Waiting for Analysis
+                    </h2>
+
+                    <p id="finalAdvice">
+                        Your detailed recommendation
+                        will appear after analysis.
+                    </p>
+
                 </div>
-                <div id="finalGrade" class="final-grade">--</div>
-            </div>
+
+
+                <div
+                    id="finalGrade"
+                    class="final-grade"
+                >
+                    --
+                </div>
+
+            </article>
 
         </section>
 
+
+        <footer class="footer">
+
+            <div>
+
+                <strong>
+                    ATSLens
+                </strong>
+
+                <span>
+                    Professional ATS Resume Intelligence
+                </span>
+
+            </div>
+
+            <p>
+                Designed for focused resume evaluation
+                and career readiness.
+            </p>
+
+        </footer>
+
     </main>
+
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
