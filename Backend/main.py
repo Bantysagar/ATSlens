@@ -1,3 +1,4 @@
+from services.v2_engine import analyze_resume_v2
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -41,6 +42,80 @@ def health():
     return {
         "status": "online"
     }
+
+
+@app.get("/v2/health")
+def v2_health():
+    return {
+        "status": "online",
+        "engine": "ATSLens-Advanced-V2-Phase1"
+    }
+
+
+@app.post("/analyze-v2")
+async def analyze_v2(
+    file: UploadFile = File(...),
+    job_description: str = Form(...),
+    candidate_type: str = Form(...),
+    target_field: str = Form(...),
+    experience_years: int = Form(0),
+    preferred_role: str = Form(""),
+    target_company: str = Form("MNC")
+):
+    try:
+        if not file.filename:
+            raise HTTPException(
+                status_code=400,
+                detail="No resume file uploaded."
+            )
+
+        allowed_extensions = [".pdf", ".docx", ".txt"]
+
+        if not any(
+            file.filename.lower().endswith(ext)
+            for ext in allowed_extensions
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid file type. Upload PDF, DOCX, or TXT file."
+            )
+
+        resume_text = await extract_text_from_resume(file)
+
+        if not resume_text:
+            raise HTTPException(
+                status_code=400,
+                detail="Could not extract text from resume. Try another file."
+            )
+
+        result = analyze_resume_v2(
+            resume_text=resume_text,
+            job_description=job_description,
+            candidate_type=candidate_type,
+            target_field=target_field,
+            experience_years=experience_years,
+            preferred_role=preferred_role,
+            target_company=target_company
+        )
+
+        result["filename"] = file.filename
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"V2 internal server error: {str(error)}"
+        )
 
 
 @app.post("/analyze")
