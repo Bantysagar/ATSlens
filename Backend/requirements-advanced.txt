@@ -1,0 +1,4 @@
+-r requirements.txt
+# Optional local semantic backend. The V3 API falls back to TF-IDF when this
+# package/model is unavailable, so lightweight deployments remain functional.
+sentence-transformers>=3.0,<6

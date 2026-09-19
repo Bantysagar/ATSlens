@@ -1,18 +1,26 @@
 from services.v2_engine import analyze_resume_v2
+from services.v3_engine import analyze_resume_v3
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from analyzer import analyze_resume
-from database import get_analysis, init_db, save_analysis
+from database import (
+    get_analysis,
+    get_analysis_v3,
+    init_db,
+    save_analysis,
+    save_analysis_v3,
+)
 from parser import extract_text_from_resume
 from pdf_report import generate_pdf_report
+from pdf_report_v3 import generate_pdf_report_v3
 
 
 app = FastAPI(
     title="ATSLens API",
     description="AI Powered ATS Resume Analyzer Backend",
-    version="2.0.0"
+    version="3.0.0"
 )
 
 app.add_middleware(
@@ -116,6 +124,83 @@ async def analyze_v2(
             status_code=500,
             detail=f"V2 internal server error: {str(error)}"
         )
+
+
+@app.get("/v3/health")
+def v3_health():
+    from services.semantic_matcher import semantic_backend_status
+
+    return {
+        "status": "online",
+        "engine": "ATSLens-Advanced-V3-Integrated",
+        "semantic_backend": semantic_backend_status(),
+    }
+
+
+@app.post("/analyze-v3")
+async def analyze_v3(
+    file: UploadFile = File(...),
+    job_description: str = Form(...),
+    candidate_type: str = Form(...),
+    target_field: str = Form(...),
+    experience_years: int = Form(0),
+    preferred_role: str = Form(""),
+    target_company: str = Form("MNC")
+):
+    try:
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No resume file uploaded.")
+
+        allowed_extensions = [".pdf", ".docx", ".txt"]
+        if not any(file.filename.lower().endswith(ext) for ext in allowed_extensions):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid file type. Upload PDF, DOCX, or TXT file."
+            )
+
+        resume_text = await extract_text_from_resume(file)
+        if not resume_text:
+            raise HTTPException(
+                status_code=400,
+                detail="Could not extract text from resume. Try another file."
+            )
+
+        result = analyze_resume_v3(
+            resume_text=resume_text,
+            job_description=job_description,
+            candidate_type=candidate_type,
+            target_field=target_field,
+            experience_years=experience_years,
+            preferred_role=preferred_role,
+            target_company=target_company,
+        )
+        result["filename"] = file.filename
+        analysis_id = save_analysis_v3(result)
+        result["analysis_id"] = analysis_id
+        result["pdf_url"] = f"/download-v3-report/{analysis_id}"
+        return result
+
+    except HTTPException:
+        raise
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"V3 internal server error: {str(error)}")
+
+
+@app.get("/download-v3-report/{analysis_id}")
+def download_v3_report(analysis_id: int):
+    data = get_analysis_v3(analysis_id)
+    if not data:
+        raise HTTPException(status_code=404, detail="Advanced report not found.")
+
+    pdf_buffer = generate_pdf_report_v3(data)
+    filename = f"ATSLens_Advanced_Report_{analysis_id}.pdf"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
 
 
 @app.post("/analyze")

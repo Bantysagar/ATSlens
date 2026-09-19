@@ -1,0 +1,25 @@
+ATSLens ADVANCED V3 - ONE-TIME INTEGRATED PATCH
+
+Use this only on your current `phase2-semantic` branch. Your `advanced-v2`
+branch remains the Phase 1.2 backup.
+
+1) Stop Uvicorn with Ctrl+C.
+2) Copy the patch/project files into your existing D:\BANTY\ATSlens folder,
+   preserving the folder structure. Do NOT delete your .git folder or venv.
+3) In the activated venv:
+       cd D:\BANTY\ATSlens\Backend
+       python -m pip install -r requirements.txt
+   Optional transformer backend (recommended locally):
+       python -m pip install -r requirements-advanced.txt
+4) Start:
+       uvicorn main:app --reload
+5) Test in Swagger:
+       http://127.0.0.1:8000/docs
+       GET  /v3/health
+       POST /analyze-v3
+6) Visual dashboard:
+   Open Frontend/advanced.html with VS Code Live Server while the local backend
+   is running.
+7) Do NOT merge to main yet. First compare V2 and V3 with the same resume/JD.
+
+V3 keeps legacy /analyze and /analyze-v2 routes intact.
