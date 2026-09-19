@@ -1,5 +1,6 @@
 from services.v2_engine import analyze_resume_v2
 from services.v3_engine import analyze_resume_v3
+from services.v4_engine import analyze_career_intelligence_v4
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -20,7 +21,7 @@ from pdf_report_v3 import generate_pdf_report_v3
 app = FastAPI(
     title="ATSLens API",
     description="AI Powered ATS Resume Analyzer Backend",
-    version="3.0.0"
+    version="4.0.0"
 )
 
 app.add_middleware(
@@ -135,6 +136,60 @@ def v3_health():
         "engine": "ATSLens-Advanced-V3-Integrated",
         "semantic_backend": semantic_backend_status(),
     }
+
+
+@app.get("/v4/health")
+def v4_health():
+    from services.role_profiles import role_names
+
+    return {
+        "status": "online",
+        "engine": "ATSLens-Career-Intelligence-V4",
+        "role_profile_count": len(role_names()),
+        "roles": role_names(),
+    }
+
+
+@app.post("/career-intelligence-v4")
+async def career_intelligence_v4(
+    file: UploadFile = File(...),
+    candidate_type: str = Form("Fresher"),
+    target_field: str = Form("AI/ML"),
+    experience_years: int = Form(0),
+):
+    try:
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No resume file uploaded.")
+
+        allowed_extensions = [".pdf", ".docx", ".txt"]
+        if not any(file.filename.lower().endswith(ext) for ext in allowed_extensions):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid file type. Upload PDF, DOCX, or TXT file."
+            )
+
+        resume_text = await extract_text_from_resume(file)
+        if not resume_text:
+            raise HTTPException(
+                status_code=400,
+                detail="Could not extract text from resume. Try another file."
+            )
+
+        result = analyze_career_intelligence_v4(
+            resume_text=resume_text,
+            candidate_type=candidate_type,
+            experience_years=experience_years,
+            target_field=target_field,
+        )
+        result["filename"] = file.filename
+        return result
+
+    except HTTPException:
+        raise
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"V4 internal server error: {str(error)}")
 
 
 @app.post("/analyze-v3")
